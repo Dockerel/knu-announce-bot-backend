@@ -3,4 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    pass
+    
+    """User Model Definition"""
+
+    email = models.EmailField()
