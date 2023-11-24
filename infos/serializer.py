@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import ModelSerializer
 from .models import Info
 
 
@@ -8,6 +8,6 @@ class TinyInfoSerializer(ModelSerializer):
         fields = (
             "info_type",
             "title",
-            "link",
+            "href",
             "date",
         )

@@ -23,10 +23,6 @@ class Info(CommonModel):
     title = models.CharField(max_length=100)
     href = models.CharField(max_length=100)
     date = models.CharField(max_length=12)
-    owner = models.OneToOneField(
-        "users.user",
-        on_delete=models.CASCADE,
-    )
 
     def __str__(self) -> str:
         return f"{self.info_type} / {self.title[:8]}..."

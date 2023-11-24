@@ -3,18 +3,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Info
 from .serializer import TinyInfoSerializer
-import os, environ
+import environ
 import datetime as dt
 
-env = environ.Env(
-    # set casting, default value
-    DEBUG=(bool, False)
-)
+env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env()
-
-
-def addZero(n):
-    return n if n >= 10 else "0" + str(n)
 
 
 def diff_day(s1):
@@ -30,7 +23,6 @@ class Infos(APIView):
             serializer = TinyInfoSerializer(
                 all_infos,
                 many=True,
-                context={"request": request},
             )
             return Response(serializer.data)
         else:
@@ -39,8 +31,6 @@ class Infos(APIView):
     def post(self, request, secret):
         if secret == env("POST_SECRET_KEY"):
             # delete
-            x = dt.datetime.now()
-            today = s = f"{x.year}-{addZero(x.month)}-{addZero(x.day)}"
             infos = Info.objects.all()
             for info in infos:
                 if diff_day(info.date) > 7:

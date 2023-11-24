@@ -10,5 +10,4 @@ class LinkAdmin(admin.ModelAdmin):
         "title",
         "href",
         "date",
-        "owner",
     )
