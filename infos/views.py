@@ -18,6 +18,12 @@ def diff_day(s1):
 
 class Infos(APIView):
     def get(self, request, secret):
+        # delete
+        infos = Info.objects.all()
+        for info in infos:
+            if diff_day(info.date) > 7:
+                info.delete()
+
         if secret == env("GET_SECRET_KEY"):
             all_infos = Info.objects.all()
             serializer = TinyInfoSerializer(
@@ -30,12 +36,6 @@ class Infos(APIView):
 
     def post(self, request, secret):
         if secret == env("POST_SECRET_KEY"):
-            # delete
-            infos = Info.objects.all()
-            for info in infos:
-                if diff_day(info.date) > 7:
-                    info.delete()
-
             serializer = TinyInfoSerializer(data=request.data)
             if serializer.is_valid():
                 info = serializer.save()
