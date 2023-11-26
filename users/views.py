@@ -6,6 +6,10 @@ from rest_framework.exceptions import ParseError
 from django.contrib.auth import authenticate, login, logout
 from .models import User
 from .serializers import TinyUserSerializer, SignUpSerializer
+import environ, json
+
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env()
 
 
 class SignUp(APIView):
@@ -83,3 +87,14 @@ class SignOut(APIView):
             {"ok": "Bye"},
             status=status.HTTP_200_OK,
         )
+
+
+class DeleteErrorUsers(APIView):
+    def post(self, request, postsecret):
+        if env("POST_SECRET_KEY") != postsecret:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        error_links = json.loads(request.data)
+        for link in error_links:
+            user = User.objects.get(username=link.get("owner")["username"])
+            user.delete()
+        return Response(status=status.HTTP_200_OK)
