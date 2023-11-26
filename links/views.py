@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Link
 from .serializer import TinyLinkSerializer
@@ -13,9 +13,9 @@ environ.Env.read_env()
 
 
 class AllLinks(APIView):
-    permission_classes = [IsAdminUser]
-
-    def get(self, request):
+    def get(self, request, getsecret):
+        if env("GET_SECRET_KEY") != getsecret:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
             all_links = Link.objects.all()
             serializer = TinyLinkSerializer(
