@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.exceptions import ParseError
 from django.contrib.auth import authenticate, login, logout
 from .models import User
-from .serializers import TinyUserSerializer, SignUpSerializer
+from .serializers import TinyUserSerializer, TinyUserSerializer
 import environ, json
 
 env = environ.Env(DEBUG=(bool, False))
@@ -26,7 +26,7 @@ class SignUp(APIView):
             new_user = serializer.save()
             new_user.set_password(password)
             new_user.save()
-            serializer = SignUpSerializer(new_user)
+            serializer = TinyUserSerializer(new_user)
             return Response(serializer.data)
         else:
             return Response(

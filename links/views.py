@@ -5,7 +5,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Link
-from .serializer import TinyLinkSerializer
+from .serializer import LinkSerializer
 import environ, requests
 
 env = environ.Env(DEBUG=(bool, False))
@@ -18,7 +18,7 @@ class AllLinks(APIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
             all_links = Link.objects.all()
-            serializer = TinyLinkSerializer(
+            serializer = LinkSerializer(
                 all_links,
                 many=True,
                 context={"request": request},
@@ -40,12 +40,12 @@ class AddLink(APIView):
         )
         if response.status_code != 204:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        serializer = TinyLinkSerializer(data=request.data)
+        serializer = LinkSerializer(data=request.data)
         if serializer.is_valid():
             link = serializer.save(
                 owner=request.user,
             )
-            serializer = TinyLinkSerializer(link)
+            serializer = LinkSerializer(link)
             return Response(serializer.data)
         else:
             return Response(
@@ -64,21 +64,21 @@ class OneLink(APIView):
     def get(self, request, username):
         if username == request.user.username:
             link = self.get_object(request.user.pk)
-            serializer = TinyLinkSerializer(link)
+            serializer = LinkSerializer(link)
             return Response(serializer.data)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, username):
         if username == request.user.username:
             link = self.get_object(request.user.pk)
-            serializer = TinyLinkSerializer(
+            serializer = LinkSerializer(
                 link,
                 data=request.data,
                 partial=True,
             )
             if serializer.is_valid():
                 updated_link = serializer.save()
-                serializer = TinyLinkSerializer(updated_link)
+                serializer = LinkSerializer(updated_link)
                 return Response(serializer.data)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

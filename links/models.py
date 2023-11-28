@@ -8,8 +8,9 @@ class Link(CommonModel):
 
     link = models.CharField(max_length=200)
     owner = models.OneToOneField(
-        "users.user",
+        "users.User",
         on_delete=models.CASCADE,
+        default="",
     )
 
     def __str__(self) -> str:
