@@ -4,7 +4,7 @@ from links.serializer import TinyLinkSerializer
 
 
 class TinyUserSerializer(ModelSerializer):
-    link = TinyLinkSerializer()
+    link = TinyLinkSerializer(read_only=True)
 
     class Meta:
         model = User

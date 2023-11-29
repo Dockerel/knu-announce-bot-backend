@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.exceptions import ParseError
 from django.contrib.auth import authenticate, login, logout
 from .models import User
-from .serializers import TinyUserSerializer, TinyUserSerializer
+from .serializers import TinyUserSerializer
 import environ, json
 
 env = environ.Env(DEBUG=(bool, False))
@@ -14,9 +14,9 @@ environ.Env.read_env()
 
 class SignUp(APIView):
     def post(self, request):
+        username = request.data.get("username")
         password = request.data.get("password")
         password_check = request.data.get("password_check")
-        username = request.data.get("username")
         if User.objects.filter(username=username).exists():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         if password != password_check or not password or not password_check:
@@ -27,6 +27,14 @@ class SignUp(APIView):
             new_user.set_password(password)
             new_user.save()
             serializer = TinyUserSerializer(new_user)
+
+            user = authenticate(
+            request,
+            username=username,
+            password=password,
+            )
+            login(request, user)
+
             return Response(serializer.data)
         else:
             return Response(
