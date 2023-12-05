@@ -55,22 +55,22 @@ class AddLink(APIView):
 
 
 class OneLink(APIView):
-    def get_object(self, pk):
+    def get_object(self, user):
         try:
-            return Link.objects.get(pk=pk)
+            return Link.objects.get(owner=user)
         except ObjectDoesNotExist:
             raise NotFound
 
     def get(self, request, username):
         if username == request.user.username:
-            link = self.get_object(request.user.pk)
+            link = self.get_object(request.user)
             serializer = LinkSerializer(link)
             return Response(serializer.data)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, username):
         if username == request.user.username:
-            link = self.get_object(request.user.pk)
+            link = self.get_object(request.user)
             serializer = LinkSerializer(
                 link,
                 data=request.data,
