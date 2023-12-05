@@ -6,11 +6,10 @@ class Link(CommonModel):
 
     """Link Model Definition"""
 
-    link = models.CharField(max_length=200)
+    link = models.CharField(max_length=200,default="")
     owner = models.OneToOneField(
         "users.User",
         on_delete=models.CASCADE,
-        default="",
     )
 
     def __str__(self) -> str:
