@@ -54,32 +54,28 @@ class AddLink(APIView):
             )
 
 
-class OneLink(APIView):
+class MyLink(APIView):
     def get_object(self, user):
         try:
             return Link.objects.get(owner=user)
         except ObjectDoesNotExist:
             raise NotFound
 
-    def get(self, request, username):
-        if username == request.user.username:
-            link = self.get_object(request.user)
-            serializer = LinkSerializer(link)
-            return Response(serializer.data)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request):
+        link = self.get_object(request.user)
+        serializer = LinkSerializer(link)
+        return Response(serializer.data)
 
-    def put(self, request, username):
-        if username == request.user.username:
-            link = self.get_object(request.user)
-            serializer = LinkSerializer(
-                link,
-                data=request.data,
-                partial=True,
-            )
-            if serializer.is_valid():
-                updated_link = serializer.save()
-                serializer = LinkSerializer(updated_link)
-                return Response(serializer.data)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request):
+        link = self.get_object(request.user)
+        serializer = LinkSerializer(
+            link,
+            data=request.data,
+            partial=True,
+        )
+        if serializer.is_valid():
+            updated_link = serializer.save()
+            serializer = LinkSerializer(updated_link)
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
