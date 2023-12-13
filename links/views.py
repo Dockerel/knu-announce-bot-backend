@@ -31,8 +31,15 @@ class AllLinks(APIView):
 class AddLink(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def get_object(self, user):
+        try:
+            return Link.objects.get(owner=user)
+        except ObjectDoesNotExist:
+            return Link.objects.create(link="", owner=user)
+
+    def put(self, request):
         targetlink = request.data.get("link")
+        print(f"targetlink : {targetlink}")
         if targetlink == None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         response = requests.post(
@@ -40,11 +47,15 @@ class AddLink(APIView):
         )
         if response.status_code != 204:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        serializer = LinkSerializer(data=request.data)
+
+        link = self.get_object(request.user)
+        serializer = LinkSerializer(
+            link,
+            data=request.data,
+            partial=True,
+        )
         if serializer.is_valid():
-            link = serializer.save(
-                owner=request.user,
-            )
+            link = serializer.save()
             serializer = LinkSerializer(link)
             return Response(serializer.data)
         else:
