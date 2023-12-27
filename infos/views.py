@@ -16,35 +16,57 @@ def diff_day(s1):
     return date_diff.days
 
 
-class Infos(APIView):
-    def get(self, request, secret):
-        # delete
-        infos = Info.objects.all()
-        for info in infos:
-            if diff_day(info.date) > 7:
-                info.delete()
+class PostInfos(APIView):
 
-        if secret == env("GET_SECRET_KEY"):
+    def post(self, request, secret):
+        try:
+            if secret == env("POST_SECRET_KEY"):
+                serializer = TinyInfoSerializer(data=request.data)
+                if serializer.is_valid():
+                    info = serializer.save()
+                    serializer = TinyInfoSerializer(info)
+                    return Response(serializer.data)
+                else:
+                    return Response(
+                        serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class GetAllInfos(APIView):
+    def get(self, request):
+        try:
             all_infos = Info.objects.all()
             serializer = TinyInfoSerializer(
                 all_infos,
                 many=True,
             )
             return Response(serializer.data)
-        else:
+        except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    def post(self, request, secret):
-        if secret == env("POST_SECRET_KEY"):
-            serializer = TinyInfoSerializer(data=request.data)
-            if serializer.is_valid():
-                info = serializer.save()
-                serializer = TinyInfoSerializer(info)
-                return Response(serializer.data)
-            else:
-                return Response(
-                    serializer.errors,
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-        else:
+        
+# class GetTodayInfos(APIView):
+#     def get(self, request):
+#         try:
+#             # all_infos = Info.objects.all()
+#             # serializer = TinyInfoSerializer(
+#             #     all_infos,
+#             #     many=True,
+#             # )
+#             return Response(serializer.data)
+#         except:
+#             return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+class DeleteInfos(APIView):
+    def get(self,request):
+        try:
+            infos = Info.objects.all()
+            for info in infos:
+                if diff_day(info.date) > 14:
+                    info.delete()
+            return Response(status=status.HTTP_200_OK)
+        except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
