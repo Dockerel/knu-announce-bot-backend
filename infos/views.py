@@ -17,7 +17,6 @@ def diff_day(s1):
 
 
 class PostInfos(APIView):
-
     def post(self, request, secret):
         try:
             if secret == env("POST_SECRET_KEY"):
@@ -36,6 +35,7 @@ class PostInfos(APIView):
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 class GetAllInfos(APIView):
     def get(self, request):
         try:
@@ -47,21 +47,27 @@ class GetAllInfos(APIView):
             return Response(serializer.data)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
-# class GetTodayInfos(APIView):
-#     def get(self, request):
-#         try:
-#             # all_infos = Info.objects.all()
-#             # serializer = TinyInfoSerializer(
-#             #     all_infos,
-#             #     many=True,
-#             # )
-#             return Response(serializer.data)
-#         except:
-#             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+
+
+class GetTodayInfos(APIView):
+    def get(self, request):
+        try:
+            dt_info = dt.datetime.now()
+            today_date = f"{dt_info.year}-{dt_info.month}-{dt_info.day}"
+            today_infos = Info.objects.filter(date=today_date)
+            if len(today_infos) == 0:
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            serializer = TinyInfoSerializer(
+                today_infos,
+                many=True,
+            )
+            return Response(serializer.data)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 class DeleteInfos(APIView):
-    def get(self,request):
+    def get(self, request):
         try:
             infos = Info.objects.all()
             for info in infos:
