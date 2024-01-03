@@ -142,13 +142,75 @@ class SendToday(APIView):
             linkdata = LinkSerializer(link)
             mylink = linkdata.data.get("link")
 
-            infodata = TinyInfoSerializer(infos, many=True)
+            infodata = TinyInfoSerializer(infos, many=True).data
 
-            # temp_msg = ""
-            # temp_msg += "=" * 10
-            # for d in infodata:
-            #     temp_msg += f"\n{k} | {d[0]}\n{d[1]}\n{d[2]}\n"
-            # temp_msg += "=" * 10
+            if len(infodata) > 0:
+                temp_msg = ""
+                temp_msg += "=" * 10
+                for d in infodata:
+                    info_type = d["info_type"]
+                    title = d["title"]
+                    href = d["href"]
+                    temp_msg += f"\n{self.today} | {info_type}\n{title}\n{href}\n"
+                temp_msg += "=" * 10
+            else:
+                temp_msg = "=" * 10
+                temp_msg += "\nNo announcement today...\n"
+                temp_msg += "=" * 10
+
+            webhook = DiscordWebhook(url=mylink, content=temp_msg)
+            webhook.execute()
+            return Response(status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class SendAll(APIView):
+    def get_link(self, user):
+        try:
+            link = Link.objects.get(owner=user)
+            return link
+        except:
+            raise NotFound
+
+    def get_infos(self):
+        try:
+            infos = Info.objects.all()
+            return infos
+        except:
+            raise NotFound
+
+    def get(self, request):
+        try:
+            link = self.get_link(request.user)
+            infos = self.get_infos()
+
+            linkdata = LinkSerializer(link)
+            mylink = linkdata.data.get("link")
+
+            infodata = TinyInfoSerializer(infos, many=True).data
+
+            temp_msg = "=" * 10
+            pre_date = ""
+            for d in infodata:
+                if pre_date != d["date"]:
+                    if len(temp_msg) > 10:
+                        temp_msg += "=" * 10
+                        # 전송
+                        webhook = DiscordWebhook(url=mylink, content=temp_msg)
+                        webhook.execute()
+                    pre_date = d["date"]
+                    temp_msg = "=" * 10
+
+                info_type = d["info_type"]
+                title = d["title"]
+                href = d["href"]
+                temp_msg += f"\n{pre_date} | {info_type}\n{title}\n{href}\n"
+            if len(temp_msg) > 10:
+                temp_msg += "=" * 10
+                # 전송
+                webhook = DiscordWebhook(url=mylink, content=temp_msg)
+                webhook.execute()
 
             return Response(status=status.HTTP_200_OK)
         except:
