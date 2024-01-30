@@ -18,6 +18,17 @@ from discord_webhook import DiscordWebhook
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env()
 
+info_type_korean = {
+    "general": "일반공지",
+    "bachelor": "학사",
+    "scholarship": "장학",
+    "simcom": "심컴",
+    "glsob": "글솝",
+    "incom": "인컴",
+    "graduate": "대학원",
+    "contract": "대학원 계약학과",
+}
+
 
 class SignUp(APIView):
     def post(self, request):
@@ -134,7 +145,7 @@ class SendToday(APIView):
         except:
             raise NotFound
 
-    def get(self, request):
+    def post(self, request):
         try:
             link = self.get_link(request.user)
             infos = self.get_infos()
@@ -151,7 +162,7 @@ class SendToday(APIView):
                     info_type = d["info_type"]
                     title = d["title"]
                     href = d["href"]
-                    temp_msg += f"\n{self.today} | {info_type}\n{title}\n{href}\n"
+                    temp_msg += f"\n{self.today} | {info_type_korean[info_type]}\n{title}\n{href}\n"
                 temp_msg += "=" * 10
             else:
                 temp_msg = "=" * 10
@@ -180,7 +191,7 @@ class SendAll(APIView):
         except:
             raise NotFound
 
-    def get(self, request):
+    def post(self, request):
         try:
             link = self.get_link(request.user)
             infos = self.get_infos()
@@ -205,7 +216,9 @@ class SendAll(APIView):
                 info_type = d["info_type"]
                 title = d["title"]
                 href = d["href"]
-                temp_msg += f"\n{pre_date} | {info_type}\n{title}\n{href}\n"
+                temp_msg += (
+                    f"\n{pre_date} | {info_type_korean[info_type]}\n{title}\n{href}\n"
+                )
             if len(temp_msg) > 10:
                 temp_msg += "=" * 10
                 # 전송
