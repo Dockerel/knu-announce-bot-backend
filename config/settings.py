@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os, environ
 import dj_database_url
+import sentry_sdk
 
 env = environ.Env(
     # set casting, default value
@@ -170,3 +171,10 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:3000",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+if not DEBUG:
+    sentry_sdk.init(
+        dsn="https://5f7c0b3516a632b68a6be797021406fb@o4504395421974528.ingest.sentry.io/4506665911713792",
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
