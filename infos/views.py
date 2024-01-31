@@ -78,7 +78,5 @@ class DeleteInfos(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class MakeErrors(APIView):
-    def get(self, request):
-        division_by_zero = 1 / 0
-        return Response(status=status.HTTP_200_OK)
+def make_error(request):
+    division_by_zero = 1 / 0
