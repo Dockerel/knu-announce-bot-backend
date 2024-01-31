@@ -6,5 +6,5 @@ urlpatterns = [
     path("getToday", views.GetTodayInfos.as_view()),
     path("deleteInfos", views.DeleteInfos.as_view()),
     path("<str:secret>", views.PostInfos.as_view()),
-    path("make-error", views.MakeError.as_view()),
+    path("make-error", views.MakeError),
 ]
